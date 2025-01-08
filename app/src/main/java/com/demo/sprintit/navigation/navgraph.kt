@@ -5,35 +5,39 @@ import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph
 import androidx.navigation.NavHostController
-import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.createGraph
+import com.demo.sprintit.presentation.ui.screens.authentication.CompleteProfileScreen
 import com.demo.sprintit.presentation.ui.screens.authentication.SignInScreen
 import com.demo.sprintit.presentation.ui.screens.authentication.SignUpScreen
 import com.demo.sprintit.presentation.ui.screens.homescreen.HomeScreen
 import com.demo.sprintit.presentation.ui.screens.landing.LandingScreen
-import com.demo.sprintit.presentation.viewmodel.SignInViewmodel
+import com.demo.sprintit.presentation.viewmodel.AuthViewModel
 import kotlinx.serialization.Serializable
 
 @Serializable object Auth
 @Serializable object Landing
 @Serializable object SignIn
 @Serializable object SignUp
+@Serializable
+data class CompleteProfile(val email: String = "")
 @Serializable object Home
 
 
 @Composable
 fun navGraph(
     navController: NavHostController = rememberNavController(),
-    viwModel: SignInViewmodel = viewModel()
+    viwModel: AuthViewModel = viewModel()
 ): NavGraph {
     val navGraph = remember(navController) {
         navController.createGraph(startDestination = if (viwModel.isSignedIn()) Home else Auth) {
 
+//        navController.createGraph(startDestination = Auth) {
+
             navigation<Auth>(startDestination = Landing) {
-                composable<Landing>() {
+                composable<Landing> {
                     LandingScreen(
 
                         onNavigateToSignIn = {
@@ -42,7 +46,7 @@ fun navGraph(
                         },
                         )
                 }
-                composable<SignIn>() {
+                composable<SignIn> {
                     SignInScreen(
                         onNavigateToSignUp = {
                             navController.navigate(SignUp) {
@@ -56,23 +60,35 @@ fun navGraph(
                         }
                     )
                 }
-                composable<SignUp>() {
+                composable<SignUp> {
                     SignUpScreen(
                         onNavigateToSignIn = {
                             navController.navigate(SignIn) {
                                 popUpTo(SignUp) { inclusive = true }
                             }
                         },
-                        onNavigateToHome = {
-                            navController.navigate(Home) {
+                        onNavigateToCopleteProfile = { email ->
+                            navController.navigate(CompleteProfile(email = email.toString())){
+
                                 popUpTo(SignUp) { inclusive = true }
                             }
                         }
                     )
                 }
+                composable<CompleteProfile> { backStackEntry ->
+                    val email = backStackEntry.arguments?.getString("email")
+                     CompleteProfileScreen(
+                         onNavigateToHome = {
+                             navController.navigate(Home) {
+                                    popUpTo(Landing) { inclusive = true }
+                             }
+                         },
+                         email = email ?: ""
+                     )
+                }
             }
 
-                composable<Home>() {
+                composable<Home> {
                     HomeScreen(
                         onLogout = {
                             navController.navigate(Auth) {

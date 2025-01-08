@@ -8,6 +8,7 @@ data class User(
     val name: String = "",
     val email: String = "",
     val profileImageUrl: String = "",
-    val role: String = "Member", // Roles like Admin, Member, etc.
+    val role: String = "Member",
     val createdAt: Long = System.currentTimeMillis()
 )
+

@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material3.Button
@@ -31,16 +30,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.demo.sprintit.presentation.viewmodel.SignInUiState
-import com.demo.sprintit.presentation.viewmodel.SignInViewmodel
-import kotlinx.coroutines.launch
+import com.demo.sprintit.presentation.viewmodel.AuthUiState
+import com.demo.sprintit.presentation.viewmodel.AuthViewModel
 
 @Composable
 fun SignInScreen(
     onNavigateToSignUp: () -> Unit,
     onSignIn: () -> Unit,
-    viewModel: SignInViewmodel = viewModel()
+    viewModel: AuthViewModel = viewModel()
 ) {
+    val uiState = viewModel.uiState.collectAsState()
+
     Scaffold (
 
             ) { innerPadding ->
@@ -48,7 +48,8 @@ fun SignInScreen(
                 modifier = Modifier.padding(innerPadding),
                 onNavigateToSignUp,
                 onSignIn = onSignIn,
-                viewModel = viewModel
+                viewModel = viewModel,
+                uiState = uiState.value
             )
     }
 
@@ -60,21 +61,20 @@ fun SignInContent(
     modifier: Modifier,
     onNavigateToSignUp: () -> Unit,
     onSignIn: () -> Unit,
-    viewModel: SignInViewmodel
+    viewModel: AuthViewModel,
+    uiState: AuthUiState
 ) {
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
-    val uiState = viewModel.uiState.collectAsState()
-    val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    LaunchedEffect(uiState.value) {
-        when (uiState.value) {
-            is SignInUiState.SignedIn -> {
+    LaunchedEffect(uiState) {
+        when (uiState) {
+            is AuthUiState.SignedIn -> {
                 onSignIn()
             }
-            is SignInUiState.Error -> {
-                Toast.makeText(context, (uiState.value as SignInUiState.Error).message, Toast.LENGTH_SHORT).show()
+            is AuthUiState.Error -> {
+                Toast.makeText(context, (uiState).message, Toast.LENGTH_SHORT).show()
             }
 
             else -> {
@@ -82,16 +82,16 @@ fun SignInContent(
         }
     }
 
-    when(uiState.value ) {
-        is SignInUiState.Loading -> {
+    when(uiState) {
+        is AuthUiState.Loading -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(modifier = Modifier.size(50.dp))
+                CircularProgressIndicator()
             }
         }
-        is SignInUiState.Initial, is SignInUiState.Error  -> {
+        is AuthUiState.Initial, is AuthUiState.Error  -> {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
@@ -134,11 +134,7 @@ fun SignInContent(
 
                     }
                 ) {
-                    if (uiState.value is SignInUiState.Loading) {
-                        CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.White)
-                    } else {
                         Text(text = "Sign In")
-                    }
                 }
                 Text(
                     text = "Don't have an account? Sign Up",
@@ -149,9 +145,7 @@ fun SignInContent(
 
             }
         }
-        else -> {
-
-        }
+        else -> {}
 
 
     }

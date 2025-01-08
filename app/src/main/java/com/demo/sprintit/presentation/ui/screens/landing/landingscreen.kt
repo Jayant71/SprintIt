@@ -30,7 +30,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.demo.sprintit.R
 import com.demo.sprintit.presentation.ui.components.LandingButton
 import com.demo.sprintit.presentation.ui.components.LandingPages
-import com.demo.sprintit.presentation.viewmodel.SignInViewmodel
+import com.demo.sprintit.presentation.viewmodel.AuthViewModel
 import kotlinx.coroutines.launch
 
 @Composable

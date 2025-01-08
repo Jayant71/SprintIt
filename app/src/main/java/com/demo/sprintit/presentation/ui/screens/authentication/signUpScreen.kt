@@ -29,16 +29,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.demo.sprintit.presentation.viewmodel.SignInUiState
-import com.demo.sprintit.presentation.viewmodel.SignInViewmodel
+import com.demo.sprintit.presentation.viewmodel.AuthUiState
+import com.demo.sprintit.presentation.viewmodel.AuthViewModel
 import com.demo.sprintit.utils.validateEmail
 import com.demo.sprintit.utils.validatePassword
 
 @Composable
 fun SignUpScreen(
     onNavigateToSignIn: () -> Unit,
-    onNavigateToHome: () -> Unit = {},
-    viewmodel: SignInViewmodel = viewModel()
+    onNavigateToCopleteProfile: (Any?) -> Unit = {},
+    viewmodel: AuthViewModel = viewModel()
 ) {
     val uiState = viewmodel.uiState.collectAsState()
 
@@ -50,7 +50,7 @@ fun SignUpScreen(
             onNavigateToSignIn = onNavigateToSignIn,
             viewmodel = viewmodel,
             state = uiState.value,
-            onNavigateToHome = onNavigateToHome
+            onNavigateToCompleteProfile = onNavigateToCopleteProfile
 
         )
     }
@@ -60,9 +60,9 @@ fun SignUpScreen(
 fun SignUpContent(
     modifier: Modifier = Modifier,
     onNavigateToSignIn: () -> Unit,
-    onNavigateToHome: () -> Unit,
-    viewmodel: SignInViewmodel,
-    state: SignInUiState
+    onNavigateToCompleteProfile: (Any?) -> Unit,
+    viewmodel: AuthViewModel,
+    state: AuthUiState
 ) {
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
@@ -71,10 +71,10 @@ fun SignUpContent(
 
     LaunchedEffect(state) {
         when (state) {
-            is SignInUiState.SignedIn -> {
-                onNavigateToHome()
+            is AuthUiState.SignedIn -> {
+                onNavigateToCompleteProfile(email.value)
             }
-            is SignInUiState.Error -> {
+            is AuthUiState.Error -> {
                 Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
             }
             else -> {
@@ -83,7 +83,7 @@ fun SignUpContent(
     }
 
     when (state) {
-        is SignInUiState.Initial, is SignInUiState.Error -> {
+        is AuthUiState.Initial, is AuthUiState.Error -> {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
@@ -148,7 +148,7 @@ fun SignUpContent(
 
             }
         }
-        is SignInUiState.Loading,  -> {
+        is AuthUiState.Loading,  -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
