@@ -22,7 +22,10 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
@@ -51,7 +54,8 @@ import com.demo.sprintit.presentation.viewmodel.AuthViewModel
 
 @Composable
 fun HomeScreen(
-    onLogout: () -> Unit = {}
+    onLogout: () -> Unit = {},
+    onNavigateToAddNewProject: () -> Unit = {}
 ) {
     val isLoggingOut = remember { mutableStateOf(false) }
     Scaffold(
@@ -63,36 +67,61 @@ fun HomeScreen(
                 }
             )
         },
-        bottomBar = {
-            BottomAppBar(
-                containerColor = Color.White,
-                contentPadding = PaddingValues(16.dp),
+//        bottomBar = {
+//            BottomAppBar(
+//                containerColor = Color.White,
+//                contentPadding = PaddingValues(16.dp),
+//            ) {
+//                Row(
+//                    horizontalArrangement = Arrangement.SpaceAround,
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(horizontal = 30.dp),
+//                    verticalAlignment = Alignment.CenterVertically,
+//
+//                ) {
+//                    TabRowItem(
+//                        icon = Icons.Default.Home,
+//                        text = "Home",
+//                        isSelected = true
+//                    )
+//                    TabRowItem(
+//                        icon = Icons.Default.Settings,
+//                        text = "Settings",
+//                        isSelected = false
+//                    )
+//                }
+//            }
+//        },
+        floatingActionButton = {
+            Button(
+                onClick = {
+                    onNavigateToAddNewProject()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = Color.White
+                ),
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceAround,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 30.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-
+                Row (
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    TabRowItem(
-                        icon = Icons.Default.Home,
-                        text = "Home",
-                        isSelected = true
+                    Text(
+                        text = "Add Project",
+                        style = TextStyle(fontWeight = FontWeight.SemiBold, fontSize = 18.sp),
+                        color = Color.White
                     )
-                    TabRowItem(
-                        icon = Icons.Default.AddCircle,
-                        isSelected = false
-                    )
-                    TabRowItem(
-                        icon = Icons.Default.Settings,
-                        text = "Settings",
-                        isSelected = false
+                    Spacer(modifier = Modifier.size(8.dp))
+                    Icon(
+                        imageVector = Icons.Default.AddCircle,
+                        contentDescription = "Add",
+                        modifier = Modifier.size(32.dp)
                     )
                 }
             }
-        }
+        },
+        floatingActionButtonPosition = FabPosition.Center,
     ) {  innerPadding ->
         HomeContent(
             modifier = Modifier.padding(innerPadding)

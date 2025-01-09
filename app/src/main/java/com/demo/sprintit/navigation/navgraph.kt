@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.createGraph
+import com.demo.sprintit.presentation.ui.screens.addnew.AddNewProjectScreen
 import com.demo.sprintit.presentation.ui.screens.authentication.CompleteProfileScreen
 import com.demo.sprintit.presentation.ui.screens.authentication.SignInScreen
 import com.demo.sprintit.presentation.ui.screens.authentication.SignUpScreen
@@ -24,7 +25,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CompleteProfile(val email: String = "")
 @Serializable object Home
-
+@Serializable object HomeRoute
+@Serializable object AddNewProject
 
 @Composable
 fun navGraph(
@@ -32,7 +34,7 @@ fun navGraph(
     viwModel: AuthViewModel = viewModel()
 ): NavGraph {
     val navGraph = remember(navController) {
-        navController.createGraph(startDestination = if (viwModel.isSignedIn()) Home else Auth) {
+        navController.createGraph(startDestination = if (viwModel.isSignedIn()) HomeRoute else Auth) {
 
 //        navController.createGraph(startDestination = Auth) {
 
@@ -88,15 +90,30 @@ fun navGraph(
                 }
             }
 
+            navigation<HomeRoute>(startDestination = Home) {
                 composable<Home> {
                     HomeScreen(
                         onLogout = {
                             navController.navigate(Auth) {
                                 popUpTo(Home) { inclusive = true }
                             }
+                        },
+                        onNavigateToAddNewProject = {
+                            navController.navigate(AddNewProject)
                         }
                     )
                 }
+                composable<AddNewProject> {
+                    AddNewProjectScreen(
+                        onNavigateToHome = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
+            }
+
+
+
         }
     }
     return navGraph
